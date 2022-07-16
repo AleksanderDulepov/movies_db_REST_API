@@ -34,9 +34,9 @@ def get_by_id_universal(uid, class_, schema):
 
 
 def patch_universal(uid, class_):
-    input_data = request.json
-    del input_data['id']  # чтобы в случае передачи id в jsone не изменять его на новый
     try:
+        input_data = request.json
+        del input_data['id']  # чтобы в случае передачи id в jsone не изменять его на новый
         db.session.query(class_).filter(class_.id == uid).update(input_data)
         db.session.commit()
         db.session.close()

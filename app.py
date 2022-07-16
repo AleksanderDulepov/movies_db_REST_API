@@ -119,22 +119,27 @@ class MovieView(Resource):
         try:
             input_data = request.json
             item = db.session.query(Movie).filter(Movie.id == uid).one()
+            item.title = input_data.get('title')
+
+            item.description = input_data.get('description')
+            item.trailer = input_data.get('trailer')
+            item.year = input_data.get('year')
+            item.rating = input_data.get('rating')
+            item.genre_id = input_data.get('genre_id')
+            item.director_id = input_data.get('director_id')
+
+            db.session.add(item)
+            db.session.commit()
+            db.session.close()
+            return "", 204
+        except sqlalchemy.exc.IntegrityError:
+            return "Был передан уже существующий в базе id", 405
+        except (TypeError, BadRequest, AttributeError):
+            return "Переданы данные несоответствующего формата", 405
         except Exception as e:
-            return str(e), 404
+            return str(e), 405
 
-        item.title = input_data.get('title')
-        item.description = input_data.get('description')
-        item.trailer = input_data.get('trailer')
-        item.year = input_data.get('year')
-        item.rating = input_data.get('rating')
-        item.genre_id = input_data.get('genre_id')
-        item.director_id = input_data.get('director_id')
 
-        db.session.add(item)
-        db.session.commit()
-        db.session.close()
-
-        return "", 204
 
     def patch(self, uid):
         return utils.patch_universal(uid, Movie)
@@ -165,16 +170,18 @@ class DirectorView(Resource):
         try:
             input_data = request.json
             item = db.session.query(Director).filter(Director.id == uid).one()
+            item.name = input_data.get('name')
+            db.session.add(item)
+            db.session.commit()
+            db.session.close()
+            return "", 204
+        except sqlalchemy.exc.IntegrityError:
+            return "Был передан уже существующий в базе id", 405
+        except (TypeError, BadRequest, AttributeError):
+            return "Переданы данные несоответствующего формата", 405
         except Exception as e:
-            return str(e), 404
+            return str(e), 405
 
-        item.name = input_data.get('name')
-
-        db.session.add(item)
-        db.session.commit()
-        db.session.close()
-
-        return "", 204
 
     def delete(self, uid):
         return utils.delete_universal(uid, Director)
@@ -202,16 +209,19 @@ class GenreView(Resource):
         try:
             input_data = request.json
             item = db.session.query(Genre).filter(Genre.id == uid).one()
+            item.name = input_data.get('name')
+            db.session.add(item)
+            db.session.commit()
+            db.session.close()
+            return "", 204
+        except sqlalchemy.exc.IntegrityError:
+            return "Был передан уже существующий в базе id", 405
+        except (TypeError, BadRequest,AttributeError):
+            return "Переданы данные несоответствующего формата", 405
         except Exception as e:
-            return str(e), 404
+            return str(e), 405
 
-        item.name = input_data.get('name')
 
-        db.session.add(item)
-        db.session.commit()
-        db.session.close()
-
-        return "", 204
 
     def delete(self, uid):
         return utils.delete_universal(uid, Genre)
